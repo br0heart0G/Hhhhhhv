@@ -1,0 +1,31 @@
+name: Build d3d9.dll
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x86
+
+      - name: Build DLL
+        run: |
+          cl /LD /O2 /MT ^
+            gtasan.cpp ^
+            /Fe:d3d9.dll ^
+            d3d9.lib winmm.lib user32.lib kernel32.lib ^
+            /link /DLL /SUBSYSTEM:WINDOWS /MACHINE:X86
+        shell: cmd
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: d3d9
+          path: d3d9.dll
